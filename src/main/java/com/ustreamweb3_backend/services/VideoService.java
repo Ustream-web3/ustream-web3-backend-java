@@ -18,6 +18,6 @@ public interface VideoService {
     // Admin only
     String streamVideo(int videoId);
 
-    void incrementStreamingScore (User user, Videos video);
+    void incrementStreamingScore (User user);
 
 }

@@ -85,25 +85,30 @@ public class VideoServiceImpl implements VideoService {
         }
 
         // Increment the score on the leaderboard
-        incrementStreamingScore(user, video);
+        incrementStreamingScore(user);
         return video.getVideoUrl();
     }
 
     @Override
-    public void incrementStreamingScore(User user, Videos video) {
-        // Find or create a new leaderboard entry
+    public void incrementStreamingScore(User user) {
+        // Find or create a new leaderboard entry using the user
         LeaderboardEntry leaderboardEntry = leaderboardEntryRepository
-                .findByUserAndVideoUrl(user, video)
-                .orElse(new LeaderboardEntry());
+                .findByUser(user)
+                .orElseGet(() -> {
+                    LeaderboardEntry newEntry = new LeaderboardEntry();
+                    newEntry.setUser(user); // Set the user
+                    newEntry.setScore(0); // Initialize score if this is a new entry
+                    return newEntry;
+                });
 
-        // Set the user and video
-        leaderboardEntry.setUser(user);
-        leaderboardEntry.setVideo(video);
-        leaderboardEntry.setScore(leaderboardEntry.getScore() + 1); // Increment score
+        // Increment the score
+        leaderboardEntry.setScore(leaderboardEntry.getScore() + 1);
 
         // Save the updated leaderboard entry
         leaderboardEntryRepository.save(leaderboardEntry);
     }
+
+
 
 
     private User getCurrentLoggedInUser() {

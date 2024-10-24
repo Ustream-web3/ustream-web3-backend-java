@@ -19,12 +19,6 @@ public class LeaderboardEntry {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn (name = "video_id", nullable = false)
-    private Videos video;
-
-    @Column(name = "video_url", nullable = false)
-    private String videoUrl;
 
     @Column(name = "score", nullable = false)
     private int score;
