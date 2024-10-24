@@ -5,7 +5,7 @@ import lombok.Data;
 
 
 @Entity
-@Table(name ="leaderboard_entries")
+@Table(name ="leaderboard")
 @Data
 
 public class LeaderboardEntry {
@@ -18,6 +18,10 @@ public class LeaderboardEntry {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn (name = "video_id", nullable = false)
+    private Videos video;
 
     @Column(name = "video_url", nullable = false)
     private String videoUrl;

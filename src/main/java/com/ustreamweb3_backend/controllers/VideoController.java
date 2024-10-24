@@ -1,46 +1,68 @@
 package com.ustreamweb3_backend.controllers;
 
 
-import com.ustreamweb3_backend.services.VideoServiceImpl;
+import com.ustreamweb3_backend.entities.Videos;
+import com.ustreamweb3_backend.services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/videos")
 public class VideoController {
 
-    private final VideoServiceImpl videoService;
+    @Autowired
+    private VideoService videoService;
 
-    public VideoController(VideoServiceImpl videoService) {
-        this.videoService = videoService;
+
+    // Endpoint for to search for videos by name
+    @GetMapping("/search")
+    public ResponseEntity<List<Videos>> getVideosByName(@RequestParam("videoName") String videoName ) {
+        List<Videos> videos = videoService.getVideosByName(videoName);
+        return ResponseEntity.ok(videos);
     }
 
-    // Endpoint to upload video - restricted to admins only
+    // Endpoints to get all videos by genre
+    @GetMapping("/filter")
+    public ResponseEntity<List<Videos>> getVideosByGenre(@RequestParam("genre") String genre) {
+        List<Videos> videos = videoService.getVideosByGenre(genre);
+        return ResponseEntity.ok(videos);
+    }
+
+    // Endopoint for uploading a videos
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file, Authentication authentication) {
+    public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file,
+                                              @RequestParam("videoName") String videoName,
+                                              @RequestParam("genre") String genre) throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Current user roles: " + authentication.getAuthorities());
+        String videoUrl = videoService.uploadVideo(file, videoName, genre);
+        return ResponseEntity.ok("Video successfully upload: " + videoUrl);
+    }
+
+    // Endpoint to stream a video
+    @GetMapping("/stream/{videoId}")
+    public ResponseEntity<String> streamVideo(@PathVariable int videoId) {
         try {
-            String adminUsername = authentication.getName(); // Retrieve logged-in admin username
-            String videoUrl = videoService.uploadVideo(file, adminUsername);
+            // Get the currently authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName(); // This retrieves
+
+            String videoUrl = videoService.streamVideo(videoId);
             return ResponseEntity.ok(videoUrl);
-        } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload video");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body("Video not found: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(403).body("User not authenticated: " + e.getMessage());
         }
     }
 
-    // Endpoint to get video stream URL by public ID
-    @GetMapping("/stream/{publicId}")
-    public ResponseEntity<String> streamVideo(@PathVariable String publicId, Authentication authentication) {
-        String videoUrl = videoService.getVideoUrl(publicId);
-        String userId = authentication.getName();
-        videoService.incrementStreamingScore(userId);
-        return ResponseEntity.ok(videoUrl);
-    }
+
 }
+

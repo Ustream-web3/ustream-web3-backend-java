@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -104,6 +105,11 @@ public class UserServiceImpl implements UserService {
         if (token != null) {
             loggedOutTokens.add(token); // Mark this token as logged out
         }
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public boolean isTokenLoggedOut(String token) {

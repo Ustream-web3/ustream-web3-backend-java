@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
@@ -64,6 +66,12 @@ public class UserController {
         return isVerified
                 ? ResponseEntity.ok("OTP verified successfully.")
                 : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users); // Return the list of users
     }
 
 

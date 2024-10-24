@@ -13,15 +13,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final CustomUsersDetailsService customUsersDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(CustomUsersDetailsService customUsersDetailsService) {
+    public SecurityConfig(CustomUsersDetailsService customUsersDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customUsersDetailsService = customUsersDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
 
@@ -36,8 +39,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for stateless API
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless session management
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/videos/upload/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register/**").permitAll()  // Public signup endpoint
+                        .requestMatchers(HttpMethod.POST, "/api/videos/upload").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/videos/filter/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/videos/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/leaderboard/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/verify-otp/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/password-reset/request/**").permitAll()
@@ -45,7 +52,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/authentication-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/videos/stream/**").authenticated() // Public docs endpoint
                         .anyRequest().authenticated())  // Private endpoints
-                .authenticationManager(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)))  // Set AuthenticationManager
+                .authenticationManager(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // Add the JWT filter
                 .build();
     }
 
