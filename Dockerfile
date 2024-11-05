@@ -1,17 +1,33 @@
-# Use an official Java runtime as a parent image
-FROM openjdk:11-jre-slim
+# Use a base image with JDK (which includes Java)
+FROM openjdk:11-jdk-slim
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the Maven wrapper and the rest of the application code
-COPY . .
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Maven and build the application
+# Copy the Maven wrapper files and pom.xml
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+
+# Install project dependencies
+RUN ./mvnw dependency:go-offline
+
+# Copy the application source code
+COPY src ./src
+
+# Package the application
 RUN ./mvnw clean package
 
-# Expose the application port (optional, update if your app uses a specific port)
+# Copy the jar file into the container
+COPY target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the port your application runs on
 EXPOSE 8080
 
-# Command to run the application
-CMD ["java", "-jar", "target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar"]
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
