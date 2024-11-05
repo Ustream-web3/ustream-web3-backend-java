@@ -1,35 +1,34 @@
-#################################################################
-# render.yaml for configuring a Spring Boot application on Render
-#################################################################
+services:
+  - name: ustreamweb3-backend
+    type: web
+    runtime: docker  # For Java apps, you can specify 'docker' and include a Dockerfile
+    plan: free  # Use "starter" or "standard" for more resources
+    branch: main
+    buildCommand: ./mvnw clean package  # Adjust this if using Gradle
+    startCommand: java -jar target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar  # Update to match your .jar name
+
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:mysql://sql.freedb.tech:3306/freedb_ustreamweb3
+      - key: SPRING_DATASOURCE_USERNAME
+        value: freedb_ustreamweb3-users
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: kAY9Y?9H$%9Kf@$
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod  # or any other profile name you're using in production
+
+    region: oregon  # Specify your preferred region: oregon, ohio, virginia, frankfurt, singapore
+
+databases:
+  - name: my-database  # Placeholder name for any future databases, if needed (e.g., for PostgreSQL)
+    plan: free
+    region: oregon
 
 previews:
-  generation: automatic
+  generation: manual  # Can also set to 'automatic' or 'off'
 
-services:
-  - type: web
-    runtime: java
-    name: ustreamweb3-backend
-    repo: https://github.com/Ustream-web3/ustream-web3-backend-java
-    numInstances: 1
-    region: oregon
-    plan: free
-    branch: main
-    buildCommand: ./mvnw clean package
-    startCommand: java -jar target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar
-    autoDeploy: true
-    maxShutdownDelaySeconds: 120
+envVarGroups:
+  - name: MyEnvironmentGroup
     envVars:
-      - key: SPRING_PROFILES_ACTIVE
-        value: prod
-      - key: DB_HOST
-        value: sql.freedb.tech
-      - key: DB_PORT
-        value: 3306
-      - key: DB_NAME
-        value: freedb_ustreamweb3
-      - key: DB_USERNAME
-        value: freedb_ustreamweb3-users
-      - key: DB_PASSWORD
-        value: kAY9Y?9H$%9Kf@$
       - key: APP_SECRET
-        generateValue: true
+        generateValue: true  # Generates a random secret key for sensitive information
