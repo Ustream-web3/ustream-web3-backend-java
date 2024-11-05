@@ -23,7 +23,7 @@ services:
       - key: SPRING_DATASOURCE_PASSWORD
         value: kAY9Y?9H$%9Kf@$
       - key: SPRING_PROFILES_ACTIVE
-        value: prod  # Active Spring profile
+        value: dev  # Active Spring profile
 
     region: oregon  # Preferred region for deployment
 
