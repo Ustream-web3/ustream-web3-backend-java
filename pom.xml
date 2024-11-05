@@ -11,6 +11,7 @@
 	<groupId>com.ustreamweb3</groupId>
 	<artifactId>ustreamweb3-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>ustreamweb3-backend</name>
 	<description>ustreamweb3 backend application</description>
 	<url/>
