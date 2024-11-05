@@ -5,12 +5,11 @@ import com.ustreamweb3_backend.entities.Otp;
 import com.ustreamweb3_backend.entities.User;
 
 
-
-
-
 public interface OtpService {
     Otp generateAndSaveOtp(User user);
     boolean verifyOtp(OtpVerificationDTO otpVerificationDTO, User user);
+    void resendOtp(String userId);
 
 
 }
+

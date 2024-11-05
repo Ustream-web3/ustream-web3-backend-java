@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -37,6 +38,7 @@ public class UserController {
         System.out.println("Received Registration Data: " + registrationDTO);
         userService.registerUser(registrationDTO);
         return ResponseEntity.ok("User registered successfully");
+
     }
 
     @PostMapping("/logout")
@@ -66,6 +68,16 @@ public class UserController {
         return isVerified
                 ? ResponseEntity.ok("OTP verified successfully.")
                 : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<String> resendOtp(@RequestParam String userId) {
+        try {
+            otpService.resendOtp(userId);
+            return ResponseEntity.ok("OTP has been resent successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/users")

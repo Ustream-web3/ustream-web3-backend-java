@@ -1,10 +1,35 @@
+#################################################################
+# render.yaml for configuring a Spring Boot application on Render
+#################################################################
+
+previews:
+  generation: automatic
+
 services:
   - type: web
+    runtime: java
     name: ustreamweb3-backend
-    env: java
+    repo: https://github.com/Ustream-web3/ustream-web3-backend-java
+    numInstances: 1
+    region: oregon
     plan: free
+    branch: main
     buildCommand: ./mvnw clean package
     startCommand: java -jar target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar
+    autoDeploy: true
+    maxShutdownDelaySeconds: 120
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: DB_HOST
+        value: sql.freedb.tech
+      - key: DB_PORT
+        value: 3306
+      - key: DB_NAME
+        value: freedb_ustreamweb3
+      - key: DB_USERNAME
+        value: freedb_ustreamweb3-users
+      - key: DB_PASSWORD
+        value: kAY9Y?9H$%9Kf@$
+      - key: APP_SECRET
+        generateValue: true

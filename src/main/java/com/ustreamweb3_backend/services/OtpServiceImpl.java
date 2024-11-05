@@ -78,6 +78,27 @@ public class OtpServiceImpl implements OtpService {
         return false;
     }
 
+    @Override
+    public void resendOtp(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Generate a new OTP using OtpUtils
+        String newOtpCode = otpUtils.generateOtpCode();
+        LocalDateTime newExpiryDate = otpUtils.generateOtpExpiryDate();
+
+        // Create or update the OTP entity
+        Otp otp = otpRepository.findByUser(user).orElse(new Otp());
+        otp.setOtpCode(newOtpCode);
+        otp.setUser(user);
+        otp.setOtpExpiryDate(newExpiryDate); // Set new expiry time
+        otpRepository.save(otp);
+
+        // Send the OTP to the user via email
+        emailService.sendOtpEmail(user.getEmail(), newOtpCode);
+    }
+
+
 
 
 }

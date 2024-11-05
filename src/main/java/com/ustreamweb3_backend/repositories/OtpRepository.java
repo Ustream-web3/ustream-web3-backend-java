@@ -9,7 +9,9 @@ import java.util.Optional;
 
 
 public interface OtpRepository extends JpaRepository<Otp, Integer> {
-    Otp findByUserAndOtpCode(OtpVerificationDTO otpVerificationDTO, User user);
+
     // Find an OTP by its code and associated user
     Optional<Otp> findByOtpCodeAndUser(String otpCode, User user);
+    // Find an OTP by its associated user
+    Optional<Otp> findByUser(User user);
 }

@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/leaderboard/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/verify-otp/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/resend-otp/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/password-reset/request/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/password-reset/reset/**").permitAll()// Public verify-otp endpoint
                         .requestMatchers(HttpMethod.GET, "/authentication-docs/**").permitAll()
