@@ -1,5 +1,5 @@
-# Use an appropriate base image with JDK and Maven
-FROM maven:3.9.9-openjdk-22
+# Use an appropriate base image with JDK and Maven for the build stage
+FROM maven:3.9.4-openjdk-22 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -20,6 +20,8 @@ RUN ./mvnw clean package
 
 # Use a smaller base image for the runtime
 FROM openjdk:11-jre-slim
+
+# Set the working directory inside the runtime container
 WORKDIR /app
 
 # Copy the JAR file from the build stage
