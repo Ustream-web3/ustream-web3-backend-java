@@ -1,31 +1,20 @@
-# Use an appropriate base image with JDK and Maven for the build stage
-FROM maven:3.9.4-openjdk-22 AS build
+# Start with a base image containing Java runtime
+FROM openjdk:8-jdk-alpine
 
-# Set the working directory inside the container
-WORKDIR /app
+# Add Maintainer Info
+LABEL maintainer="nnennahumphrey.nh@gmail.com.com"
 
-# Copy the Maven wrapper and pom.xml to the container
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
+# Add a volume pointing to /tmp
+VOLUME /tmp
 
-# Copy the source code to the container
-COPY src ./src
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
 
-# Make the Maven wrapper executable
-RUN chmod +x mvnw
+# The application's jar file
+ARG JAR_FILE=target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar
 
-# Build the application
-RUN ./mvnw clean package
+# Add the application's jar to the container
+ADD ${JAR_FILE} app.jar
 
-# Use a smaller base image for the runtime
-FROM openjdk:11-jre-slim
-
-# Set the working directory inside the runtime container
-WORKDIR /app
-
-# Copy the JAR file from the build stage
-COPY --from=build /app/target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar ./ustreamweb3-backend.jar
-
-# Specify the command to run the JAR file
-CMD ["java", "-jar", "ustreamweb3-backend.jar"]
+# Run the jar file
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
