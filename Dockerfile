@@ -1,11 +1,17 @@
-# Use a base image that has Java
-FROM openjdk:22-jdk-slim
+# Use an official Java runtime as a parent image
+FROM openjdk:11-jre-slim
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the JAR file to the container
-COPY target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar app.jar
+# Copy the Maven wrapper and the rest of the application code
+COPY . .
 
-# Run the JAR file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Install Maven and build the application
+RUN ./mvnw clean package
+
+# Expose the application port (optional, update if your app uses a specific port)
+EXPOSE 8080
+
+# Command to run the application
+CMD ["java", "-jar", "target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar"]

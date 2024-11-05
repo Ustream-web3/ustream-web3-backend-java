@@ -1,11 +1,19 @@
+#################################################################
+# Example render.yaml                                           #
+# Do not use this file directly! Consult it for reference only. #
+#################################################################
+
+previews:
+  generation: manual  # Can also set to 'automatic' or 'off'
+
 services:
   - name: ustreamweb3-backend
     type: web
-    runtime: docker  # For Java apps, you can specify 'docker' and include a Dockerfile
-    plan: free  # Use "starter" or "standard" for more resources
+    runtime: docker  # For Java apps, using Docker
+    plan: starter # Use "starter" or "standard" for more resources
     branch: main
-    buildCommand: ./mvnw clean package  # Adjust this if using Gradle
-    startCommand: java -jar target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar  # Update to match your .jar name
+    buildCommand: ./mvnw clean package  # Build command for Maven
+    startCommand: java -jar target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar  # Command to run the application
 
     envVars:
       - key: SPRING_DATASOURCE_URL
@@ -15,17 +23,14 @@ services:
       - key: SPRING_DATASOURCE_PASSWORD
         value: kAY9Y?9H$%9Kf@$
       - key: SPRING_PROFILES_ACTIVE
-        value: prod  # or any other profile name you're using in production
+        value: prod  # Active Spring profile
 
-    region: oregon  # Specify your preferred region: oregon, ohio, virginia, frankfurt, singapore
+    region: oregon  # Preferred region for deployment
 
 databases:
-  - name: my-database  # Placeholder name for any future databases, if needed (e.g., for PostgreSQL)
+  - name: my-database  # Placeholder for any future databases
     plan: free
     region: oregon
-
-previews:
-  generation: manual  # Can also set to 'automatic' or 'off'
 
 envVarGroups:
   - name: MyEnvironmentGroup
