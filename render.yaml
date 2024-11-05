@@ -12,8 +12,7 @@ services:
     runtime: docker  # For Java apps, using Docker
     plan: starter # Use "starter" or "standard" for more resources
     branch: main
-    buildCommand: ./mvnw clean package  # Build command for Maven
-     # Command to run the application
+    buildCommand: ./mvnw clean package  # Command to build the application
 
     envVars:
       - key: SPRING_DATASOURCE_URL
