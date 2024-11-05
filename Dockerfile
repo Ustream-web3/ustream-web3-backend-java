@@ -1,33 +1,29 @@
-# Use a base image with JDK (which includes Java)
-FROM openjdk:11-jdk-slim
+# Use an appropriate base image with JDK and Maven
+FROM maven:3.9.9-openjdk-11 AS build
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install Maven
-RUN apt-get update && \
-    apt-get install -y maven && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Copy the Maven wrapper and pom.xml to the container
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
 
-# Copy the Maven wrapper files and pom.xml
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
-
-# Install project dependencies
-RUN ./mvnw dependency:go-offline
-
-# Copy the application source code
+# Copy the source code to the container
 COPY src ./src
 
-# Package the application
+# Make the Maven wrapper executable
+RUN chmod +x mvnw
+
+# Build the application
 RUN ./mvnw clean package
 
-# Copy the jar file into the container
-COPY target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar app.jar
+# Use a smaller base image for the runtime
+FROM openjdk:11-jre-slim
+WORKDIR /app
 
-# Expose the port your application runs on
-EXPOSE 8080
+# Copy the JAR file from the build stage
+COPY --from=build /app/target/ustreamweb3-backend-0.0.1-SNAPSHOT.jar ./ustreamweb3-backend.jar
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Specify the command to run the JAR file
+CMD ["java", "-jar", "ustreamweb3-backend.jar"]
